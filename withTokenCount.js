@@ -1199,8 +1199,8 @@ const withTokenCount = [
     tokenCount: 112,
   },
 ];
-export default withTokenCount
-// writeToFile(withTokenCount.map((st)=> 
+export default withTokenCount;
+// writeToFile(withTokenCount.map((st)=>
 //     `${st.author}:${st.text}\n`
 // ), './string.js')
 //  console.log('!!!withTokenCount.map((st)=> st.token)',withTokenCount.map((st)=> st.tokenCount));
