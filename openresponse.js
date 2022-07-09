@@ -10,32 +10,11 @@ const response = [
 const lines = response[0].text.split("\n");
 // remove empty strings from  lines
 const res = lines.filter((line) => line.length > 0);
-console.log("!!!lines", res);
-
-import { createWriteStream } from "fs";
-import { stringify } from "csv-stringify";
-// const db = require("./db");
-const filename = "saved_from_db.csv";
-const writableStream = createWriteStream(filename);
-
-const columns = [
-  "year_month",
-  "month_of_release",
-  "passenger_type",
-  "direction",
-  "sex",
-  "age",
-  "estimate",
-];
-
-const stringifier = stringify({ header: true, columns: columns });
-// db.each(`select * from migration`, (error, row) => {
-//   if (error) {
-//     return console.log(error.message);
-//   }
-// res.forEach((line) => {
-stringifier.write(res);
-// });
-// });
-stringifier.pipe(writableStream);
-console.log("Finished writing data");
+// console.log("!!!lines", res);
+// map over res and  create  an object  where  the key is the column name and the value is the line without "1. "
+const removeNumbers = (res) => res.map((line) => {
+  // TODO proper regex to remove "1. " or "2. " or "3. " from the line
+  const lineWithoutNumber = line.replace(/^\d+\. /, "");
+  return lineWithoutNumber
+});
+console.log("!!!res2", removeNumbers(res));
