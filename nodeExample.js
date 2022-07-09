@@ -3,6 +3,8 @@ dotenv.config();
 import { Configuration, OpenAIApi } from "openai";
 import withTokenCount from "./withTokenCount.js";
 import writeToFile from "./write.js";
+import { createWriteStream } from "fs";
+import { stringify } from "csv-stringify";
 // https://codebeautify.org/javascript-escape-unescape
 
 // console.log('!!!process.env',process.env);
@@ -49,23 +51,121 @@ function authorTranscriptsSortedByOrder(byAuthor) {
     return sorted;
   });
 }
-// group withTokenCount by author using the groupedByAuthor function
-const byAuthor = groupedByAuthor(withTokenCount);
-// sort each authors array by order using the authorTranscriptsSortedByOrder function
-const authorTranscriptsSortedByOrder = authorTranscriptsSortedByOrder(byAuthor);
 
-const withCompletions = authorTranscriptsSortedByOrder.forEach(
-  (authorTranscripts) => {
-    return authorTranscripts.map((transcription) => {
-      return {
-        ...transcription,
-        completion: getCompletion(transcription.text),
-      };
-    });
+const formatCompletion = (responseText) => {
+  const lines = responseText.split("\n");
+  const cleanedLines = lines.filter((line) => line.length > 0);
+  const columns = {
+    topic: null, // 10
+    "summary of points": null, // 3
+    "what facts, if any?": null, //5
+    "what anecdotes, if any?": null, //6
+    "anecdote quote": null, //7
+  };
+
+  cleanedLines.forEach((line) => {
+    let string = line.replace(/^\d+\. /, "");
+    if (line.startsWith("3. ")) {
+      // TODO remove redunandant string bits
+      columns["summary of points"] = string;
+    }
+    if (line.startsWith("5. ")) {
+      columns["what facts, if any?"] = string;
+    }
+    if (line.startsWith("6. ")) {
+      columns["what anecdotes, if any?"] = string;
+    }
+    if (line.startsWith("7. ")) {
+      columns["anecdote quote"] = string;
+    }
+    if (line.startsWith("10. ")) {
+      columns["topic"] = string;
+    }
+  });
+  return columns;
+};
+// // // group withTokenCount by author using the groupedByAuthor function
+// const byAuthor = groupedByAuthor(withTokenCount);
+// // sort each authors array by order using the authorTranscriptsSortedByOrder function
+// const authorTranscriptsSortedByOrder = authorTranscriptsSortedByOrder(byAuthor);
+
+// const withCompletions = authorTranscriptsSortedByOrder.forEach(
+//   (authorTranscripts) => {
+//     return authorTranscripts.map((transcription) => {
+//       const completionText = await getCompletion(transcription.text)
+//       const columns =  formatCompletion(completionText);
+//       return {
+//         ...transcription,
+//         rawCompletion: completionText,
+//         ...columns,
+//       };
+//     });
+//   }
+// );
+async function composeObj(transcription) {
+  const completionText = await getCompletion(transcription.text);
+  const columns = formatCompletion(completionText);
+  const res = {
+    ...transcription,
+    rawCompletion: completionText,
+    ...columns,
+  };
+  console.log("!!!res", res);
+  return res;
+}
+async function transcriptionWithColumns(transcription) {
+  const res = [];
+  for (let i = 0; i < transcription.length; i++) {
+    const obj = await composeObj(transcription[i]);
+    res.push(obj);
   }
-);
+  // return transcription.map(composeObj);
+  return res;
+}
+// grab  first 3 records from withTokenCount
 
-// we now habe the data,  but we need to write it to a csv file in the proper format
-// should only  be the necessary  columns
-// should trim the text  from  redundant strings
-// should know the author
+async function processTranscript() {
+  const withCompletions = await transcriptionWithColumns(
+    withTokenCount.slice(0, 2)
+  );
+  console.log("!!!withCompletions", withCompletions);
+  // // print each record of withCompletions
+  // // withCompletions.forEach((transcription) => {
+  // //   console.log("!!!transcription", transcription.rawCompletion);
+  // // });
+  const byAuthor = groupedByAuthor(withCompletions);
+  // sort each authors array by order using the authorTranscriptsSortedByOrder function
+  const sortedFullData = authorTranscriptsSortedByOrder(byAuthor);
+  // for  each author iterate over speeches aand write to csv named after author
+  sortedFullData.forEach((authorTranscripts) => {
+    const author = authorTranscripts[0].author;
+    const formattedForCsv = authorTranscripts.map((transcription) => {
+      const topic = transcription["topic"];
+      const summaryOfPoints = transcription["summary of points"];
+      const whatFacts = transcription["what facts, if any?"];
+      const whatAnecdotes = transcription["what anecdotes, if any?"];
+      const anecdoteQuote = transcription["anecdote quote"];
+      return [topic, summaryOfPoints, whatFacts, whatAnecdotes, anecdoteQuote];
+    });
+    const columns = [
+      "topic", // 10
+      "summary of points", // 3
+      "what facts, if any?", //5
+      "what anecdotes, if any?", //6
+      "anecdote quote", //7
+      "original transcript", //transcript.text
+    ];
+
+    const filename = `${author}.csv`;
+    const writableStream = createWriteStream(filename);
+    const stringifier = stringify({ header: true, columns: columns });
+
+    stringifier.write(["speaker", author]);
+    formattedForCsv.forEach((summaries) => {
+      stringifier.write(summaries);
+    });
+    stringifier.pipe(writableStream);
+  });
+}
+await processTranscript();
+// console.log("!!!byAuthor", byAuthor);

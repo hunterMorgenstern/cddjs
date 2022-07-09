@@ -17,4 +17,41 @@ const removeNumbers = (res) => res.map((line) => {
   const lineWithoutNumber = line.replace(/^\d+\. /, "");
   return lineWithoutNumber
 });
-console.log("!!!res2", removeNumbers(res));
+const formatCompletion = (responseText) => {
+  const lines = responseText.split("\n");
+  const cleanedLines = lines.filter((line) => line.length > 0);
+  const columns = {
+    topic: null, // 10
+    "summary of points": null, // 3
+    "what facts, if any?": null, //5
+    "what anecdotes, if any?": null, //6
+    "anecdote quote": null, //7
+    "original transcript": null, //transcript.text
+  };
+
+  cleanedLines.forEach((line) => {
+    let string = line.replace(/^\d+\. /, "");
+    if (line.startsWith("3. ")) {
+      // TODO remove redunandant string bits
+      columns["summary of points"] = string;
+    }
+    if (line.startsWith("5. ")) {
+      columns["what facts, if any?"] = string;
+    }
+    if (line.startsWith("6. ")) {
+      columns["what anecdotes, if any?"] = string;
+    }
+    if (line.startsWith("7. ")) {
+      columns["anecdote quote"] = string;
+    }
+    if (line.startsWith("10. ")) {
+      columns["summary of points"] = string;
+    }
+  });
+  return columns;
+};
+console.log("!!!formatCompletion(", formatCompletion(response[0].text));
+
+// add columns to transcript respective transcript
+// group by author and sort by order
+export default formatCompletion;
