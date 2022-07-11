@@ -7,7 +7,6 @@ import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
 // https://codebeautify.org/javascript-escape-unescape
 
-// console.log('!!!process.env',process.env);
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -84,24 +83,7 @@ const formatCompletion = (responseText) => {
   });
   return columns;
 };
-// // // group withTokenCount by author using the groupedByAuthor function
-// const byAuthor = groupedByAuthor(withTokenCount);
-// // sort each authors array by order using the authorTranscriptsSortedByOrder function
-// const authorTranscriptsSortedByOrder = authorTranscriptsSortedByOrder(byAuthor);
 
-// const withCompletions = authorTranscriptsSortedByOrder.forEach(
-//   (authorTranscripts) => {
-//     return authorTranscripts.map((transcription) => {
-//       const completionText = await getCompletion(transcription.text)
-//       const columns =  formatCompletion(completionText);
-//       return {
-//         ...transcription,
-//         rawCompletion: completionText,
-//         ...columns,
-//       };
-//     });
-//   }
-// );
 async function composeObj(transcription) {
   const completionText = await getCompletion(transcription.text);
   const columns = formatCompletion(completionText);
@@ -125,9 +107,7 @@ async function transcriptionWithColumns(transcription) {
 // grab  first 3 records from withTokenCount
 
 async function processTranscript() {
-  const withCompletions = await transcriptionWithColumns(
-    withTokenCount.slice(0, 2)
-  );
+  const withCompletions = await transcriptionWithColumns(withTokenCount);
   console.log("!!!withCompletions", withCompletions);
   // // print each record of withCompletions
   // // withCompletions.forEach((transcription) => {
@@ -145,7 +125,15 @@ async function processTranscript() {
       const whatFacts = transcription["what facts, if any?"];
       const whatAnecdotes = transcription["what anecdotes, if any?"];
       const anecdoteQuote = transcription["anecdote quote"];
-      return [topic, summaryOfPoints, whatFacts, whatAnecdotes, anecdoteQuote];
+      const originalTranscript = transcription.text;
+      return [
+        topic,
+        summaryOfPoints,
+        whatFacts,
+        whatAnecdotes,
+        anecdoteQuote,
+        originalTranscript,
+      ];
     });
     const columns = [
       "topic", // 10
@@ -160,7 +148,6 @@ async function processTranscript() {
     const writableStream = createWriteStream(filename);
     const stringifier = stringify({ header: true, columns: columns });
 
-    stringifier.write(["speaker", author]);
     formattedForCsv.forEach((summaries) => {
       stringifier.write(summaries);
     });
