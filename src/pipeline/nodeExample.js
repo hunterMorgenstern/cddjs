@@ -13,9 +13,9 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 // writeToFile(response.data.choices, "./openresponse.js");
-export default async function getCompletion(transcript) {
-  const instructions =
-    "what is the person talking about? keep that in mind while answering the following:\n\n1. are they for, against or undecided on it?\n2. is their sentiment positive, negative or neutral?\n3. can you summarize their points?\n4. do they support their points with facts or anecdotes?\n5. if they support their point with facts, what are the facts?\n6. if they support their point with anecdotes, what are the anecdotes?\n7. can you quote the anecdote?\n8.  what are the claims they make?\n9. what are the premises they rely on?\n10. what topic are they talking about?\n\nanswer these questions with the following transcript:\n";
+const cddReportInstructions =
+  "what is the person talking about? keep that in mind while answering the following:\n\n1. are they for, against or undecided on it?\n2. is their sentiment positive, negative or neutral?\n3. can you summarize their points?\n4. do they support their points with facts or anecdotes?\n5. if they support their point with facts, what are the facts?\n6. if they support their point with anecdotes, what are the anecdotes?\n7. can you quote the anecdote?\n8.  what are the claims they make?\n9. what are the premises they rely on?\n10. what topic are they talking about?\n\nanswer these questions with the following transcript:\n";
+export default async function getCompletion(instructions, transcript) {
   // const transcript = withTokenCount[40].text;
   const prompt = `${instructions}\"${transcript}\"`;
   // const prompt = "how many states are in  the united states?";
@@ -85,7 +85,10 @@ const formatCompletion = (responseText) => {
 };
 
 async function composeObj(transcription) {
-  const completionText = await getCompletion(transcription.text);
+  const completionText = await getCompletion(
+    cddReportInstructions,
+    transcription.text
+  );
   const columns = formatCompletion(completionText);
   const res = {
     ...transcription,
