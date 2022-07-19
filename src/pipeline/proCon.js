@@ -5,6 +5,7 @@ import withTokenCount from "./withTokenCount.js";
 import writeToFile from "./write.js";
 import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
+import { json } from "stream/consumers";
 // https://codebeautify.org/javascript-escape-unescape
 
 const configuration = new Configuration({
@@ -158,3 +159,20 @@ async function processTranscript() {
   });
 }
 await processTranscript();
+// console.log("!!!byAuthor", byAuthor);
+
+// convert csv to json
+// const csvToJson = require("csvtojson");
+// const csvFilePath = "./data/cdd-report-transcripts.csv";
+// csvToJson()
+//   .fromFile(csvFilePath)
+//   .then((jsonObj) => {
+//     console.log("!!!jsonObj", jsonObj);
+//   }
+//   );
+//
+add order, timestamp to json
+// iterate over json and get completion
+// add completion to json
+// format completion in to columns
+// write to csv
