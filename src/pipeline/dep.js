@@ -117,7 +117,7 @@ async function composeObj(transcription) {
     rawCompletion: completionText,
     ...columns,
   };
-  console.log("!!!res", res);
+  // console.log("!!!res", res);
   return res;
 }
 async function transcriptionWithColumns(transcription) {
@@ -133,10 +133,10 @@ async function transcriptionWithColumns(transcription) {
 
 async function processTranscript() {
   const withCompletions = await transcriptionWithColumns(testSample);
-  console.log("!!!withCompletions", withCompletions);
+  // console.log("!!!withCompletions", withCompletions);
   // // print each record of withCompletions
   // // withCompletions.forEach((transcription) => {
-  // //   console.log("!!!transcription", transcription.rawCompletion);
+    // console.log("!!!transcription", transcription.rawCompletion);
   // // });
   const byAuthor = groupedByAuthor(withCompletions);
   // sort each authors array by order using the authorTranscriptsSortedByOrder function
