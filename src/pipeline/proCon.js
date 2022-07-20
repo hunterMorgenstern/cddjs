@@ -171,7 +171,7 @@ await processTranscript();
 //   }
 //   );
 //
-add order, timestamp to json
+// add order, timestamp to json
 // iterate over json and get completion
 // add completion to json
 // format completion in to columns
