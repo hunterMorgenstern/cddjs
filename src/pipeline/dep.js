@@ -150,11 +150,11 @@ async function processTranscript() {
       const whatFacts = transcription["what facts, if any?"];
       const whatAnecdotes = transcription["what anecdotes, if any?"];
       const anecdoteQuote = transcription["anecdote quote"];
-      const forAgainstUndecided = transcription["for/against/undecided"];
-      const sentimentPositiveNegativeNeutral = transcription["sentiment positive/negative/neutral"];
-      const factsOrAnecdotes = transcription["facts or anecdotes"];
-      const claims = transcription["claims"];
-      const premises = transcription["premises"];
+      // const forAgainstUndecided = transcription["for/against/undecided"];
+      // const sentimentPositiveNegativeNeutral = transcription["sentiment positive/negative/neutral"];
+      // const factsOrAnecdotes = transcription["facts or anecdotes"];
+      // const claims = transcription["claims"];
+      // const premises = transcription["premises"];
       const originalTranscript = transcription.text;
       return [
         topic,
@@ -162,11 +162,11 @@ async function processTranscript() {
         whatFacts,
         whatAnecdotes,
         anecdoteQuote,
-        forAgainstUndecided,
-        sentimentPositiveNegativeNeutral,
-        factsOrAnecdotes,
-        claims,
-        premises,
+        // forAgainstUndecided,
+        // sentimentPositiveNegativeNeutral,
+        // factsOrAnecdotes,
+        // claims,
+        // premises,
         originalTranscript,
       ];
     });
@@ -176,16 +176,16 @@ async function processTranscript() {
       "what facts, if any?", //5
       "what anecdotes, if any?", //6
       "anecdote quote", //7
-      "for/against/undecided", //1
-      "sentiment positive/negative/neutral", //2
-      "facts or anecdotes", //4
-      "claims", //8
-      "premises", //9
+      // "for/against/undecided", //1
+      // "sentiment positive/negative/neutral", //2
+      // "facts or anecdotes", //4
+      // "claims", //8
+      // "premises", //9
       "original transcript", //transcript.text
     ];
-    writeToFile(withCompletions, './sampleFull.js')
+    writeToFile(withCompletions, '/Users/hunter/dev/fr/CDD/results/dep/sampleFull.js')
 
-    const filename = `${author}.csv`;
+    const filename = `/Users/hunter/dev/fr/CDD/results/dep/${author}.csv`;
     const writableStream = createWriteStream(filename);
     const stringifier = stringify({ header: true, columns: columns });
 
