@@ -6,8 +6,8 @@ import writeToFile from "/Users/hunter/dev/fr/CDD/src/pipeline/tools/write.js";
 import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js";
-import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
-// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample2.js";
+// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
+import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample2.js";
 // https://codebeautify.org/javascript-escape-unescape
 
 const configuration = new Configuration({
@@ -142,7 +142,7 @@ async function transcriptionWithColumns(transcription, backupFile) {
 }
 // grab  first 3 records from testSample
 
-async function processTranscript(transcriptJSONFile, fullBackupFile) {
+async function processTranscript(transcriptJSONFile, fullBackupFile, csvResultsRepo) {
   const withCompletions = await transcriptionWithColumns(transcriptJSONFile, fullBackupFile);
   // write  a json backup full file, should be same as whats written to in sampledep
   // redunadant lose
@@ -152,9 +152,11 @@ console.log('!!!withCompletions',withCompletions);
   console.log('!!!byAuthor',byAuthor);
   const sortedFullData = authorTranscriptsSortedByOrder(byAuthor);
   console.log('!!!sortedFullData',sortedFullData);
-  formatAndWriteToCsv(sortedFullData, withCompletions);
+  formatAndWriteToCsv(sortedFullData, csvResultsRepo);
 }
-function formatAndWriteToCsv(sortedFullData) {
+
+
+function formatAndWriteToCsv(sortedFullData, csvResultsRepo) {
   // console.log('!!!sortedFullData',sortedFullData);
   sortedFullData.forEach((authorTranscripts) => {
     const author = authorTranscripts[0].author;
@@ -174,11 +176,12 @@ function formatAndWriteToCsv(sortedFullData) {
       "original transcript", //transcript.text
     ];
 
-    const filename = `/Users/hunter/dev/fr/CDD/results/dep/refactor/${author}.csv`;
+    const filename = `${csvResultsRepo}/${author}.csv`;
     console.log('!!!formattedForCsv',formattedForCsv);
     pipeToCsv(formattedForCsv, filename, columns);
   });
 }
+
 // given columns and arrayOfRows in  the same order and pipe to csv
 function pipeToCsv(arrayOfRows, destinationFileName, columns) {
   const writableStream = createWriteStream(destinationFileName);
@@ -222,5 +225,6 @@ function formattedJsonToCsv(authorTranscripts) {
 }
 await processTranscript(
  testSample,
-  "/Users/hunter/dev/fr/CDD/results/dep/refactor/sampleRefactor.js"
+  "/Users/hunter/dev/fr/CDD/results/dep/refactor/sampleRefactor.js",
+  "/Users/hunter/dev/fr/CDD/results/dep/refactor"
 );
