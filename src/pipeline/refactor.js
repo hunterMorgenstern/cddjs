@@ -5,8 +5,9 @@ import { Configuration, OpenAIApi } from "openai";
 import writeToFile from "/Users/hunter/dev/fr/CDD/src/pipeline/tools/write.js";
 import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
-import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js"
-// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
+// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js";
+import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
+// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample2.js";
 // https://codebeautify.org/javascript-escape-unescape
 
 const configuration = new Configuration({
@@ -118,67 +119,47 @@ async function composeObj(transcription) {
     rawCompletion: completionText,
     ...columns,
   };
-  // console.log("!!!res", res);
+  console.log("!!!res", res);
   return res;
 }
-async function transcriptionWithColumns(transcription) {
+
+async function transcriptionWithColumns(transcription, backupFile) {
   const res = [];
   // var stream = fs.createWriteStream("append.txt", { flags: "a" });
-  const writer = createWriteStream(`/Users/hunter/dev/fr/CDD/results/dep/sampleDep.js`);
+  const writer = createWriteStream(backupFile);
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composeObj(transcription[i]);
     // pipe each obj to a file
     writer.write(JSON.stringify(obj) + ",");
     // stream.write(index + "\n");
-      
-      res.push(obj);
-    }
-    // stream.end();
-    writer.end();
+
+    res.push(obj);
+  }
+  // stream.end();
+  writer.end();
   // return transcription.map(composeObj);
   return res;
 }
 // grab  first 3 records from testSample
 
-async function processTranscript() {
-  const withCompletions = await transcriptionWithColumns(testSample);
-  // console.log("!!!withCompletions", withCompletions);
-  // // print each record of withCompletions
-  // // withCompletions.forEach((transcription) => {
-  // console.log("!!!transcription", transcription.rawCompletion);
-  // // });
+async function processTranscript(transcriptJSONFile, fullBackupFile) {
+  const withCompletions = await transcriptionWithColumns(transcriptJSONFile, fullBackupFile);
+  // write  a json backup full file, should be same as whats written to in sampledep
+  // redunadant lose
+  // writeToFile(withCompletions, fullBackupFile);
+console.log('!!!withCompletions',withCompletions);
   const byAuthor = groupedByAuthor(withCompletions);
-  // sort each authors array by order using the authorTranscriptsSortedByOrder function
+  console.log('!!!byAuthor',byAuthor);
   const sortedFullData = authorTranscriptsSortedByOrder(byAuthor);
-  // for  each author iterate over speeches aand write to csv named after author
+  console.log('!!!sortedFullData',sortedFullData);
+  formatAndWriteToCsv(sortedFullData, withCompletions);
+}
+function formatAndWriteToCsv(sortedFullData) {
+  // console.log('!!!sortedFullData',sortedFullData);
   sortedFullData.forEach((authorTranscripts) => {
     const author = authorTranscripts[0].author;
-    const formattedForCsv = authorTranscripts.map((transcription) => {
-      const topic = transcription["topic"];
-      const summaryOfPoints = transcription["summary of points"];
-      const whatFacts = transcription["what facts, if any?"];
-      const whatAnecdotes = transcription["what anecdotes, if any?"];
-      const anecdoteQuote = transcription["anecdote quote"];
-      // const forAgainstUndecided = transcription["for/against/undecided"];
-      // const sentimentPositiveNegativeNeutral = transcription["sentiment positive/negative/neutral"];
-      // const factsOrAnecdotes = transcription["facts or anecdotes"];
-      // const claims = transcription["claims"];
-      // const premises = transcription["premises"];
-      const originalTranscript = transcription.text;
-      return [
-        topic,
-        summaryOfPoints,
-        whatFacts,
-        whatAnecdotes,
-        anecdoteQuote,
-        // forAgainstUndecided,
-        // sentimentPositiveNegativeNeutral,
-        // factsOrAnecdotes,
-        // claims,
-        // premises,
-        originalTranscript,
-      ];
-    });
+    const formattedForCsv = formattedJsonToCsv(authorTranscripts);
+
     const columns = [
       "topic", // 10
       "summary of points", // 3
@@ -192,19 +173,54 @@ async function processTranscript() {
       // "premises", //9
       "original transcript", //transcript.text
     ];
-    writeToFile(
-      withCompletions,
-      "/Users/hunter/dev/fr/CDD/results/dep/sampleFull.js"
-    );
 
-    const filename = `/Users/hunter/dev/fr/CDD/results/dep/${author}.csv`;
-    const writableStream = createWriteStream(filename);
-    const stringifier = stringify({ header: true, columns: columns });
-
-    formattedForCsv.forEach((summaries) => {
-      stringifier.write(summaries);
-    });
-    stringifier.pipe(writableStream);
+    const filename = `/Users/hunter/dev/fr/CDD/results/dep/refactor/${author}.csv`;
+    console.log('!!!formattedForCsv',formattedForCsv);
+    pipeToCsv(formattedForCsv, filename, columns);
   });
 }
-await processTranscript();
+// given columns and arrayOfRows in  the same order and pipe to csv
+function pipeToCsv(arrayOfRows, destinationFileName, columns) {
+  const writableStream = createWriteStream(destinationFileName);
+  const stringifier = stringify({ header: true, columns: columns });
+
+  arrayOfRows.forEach((summaries) => {
+    stringifier.write(summaries);
+  });
+  stringifier.pipe(writableStream);
+}
+
+// turn json to array  which order matches the columns order
+function formattedJsonToCsv(authorTranscripts) {
+  console.log('!!!authorTranscripts',authorTranscripts);
+  return authorTranscripts.map((transcription) => {
+    const topic = transcription["topic"];
+    const summaryOfPoints = transcription["summary of points"];
+    const whatFacts = transcription["what facts, if any?"];
+    const whatAnecdotes = transcription["what anecdotes, if any?"];
+    const anecdoteQuote = transcription["anecdote quote"];
+    // const forAgainstUndecided = transcription["for/against/undecided"];
+    // const sentimentPositiveNegativeNeutral = transcription["sentiment positive/negative/neutral"];
+    // const factsOrAnecdotes = transcription["facts or anecdotes"];
+    // const claims = transcription["claims"];
+    // const premises = transcription["premises"];
+    const originalTranscript = transcription.text;
+    return [
+      topic,
+      summaryOfPoints,
+      whatFacts,
+      whatAnecdotes,
+      anecdoteQuote,
+      // forAgainstUndecided,
+      // sentimentPositiveNegativeNeutral,
+      // factsOrAnecdotes,
+      // claims,
+      // premises,
+      originalTranscript,
+    ];
+  });
+}
+await processTranscript(
+ testSample,
+  "/Users/hunter/dev/fr/CDD/results/dep/refactor/sampleRefactor.js"
+);
