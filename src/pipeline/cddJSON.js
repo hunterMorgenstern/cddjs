@@ -8,7 +8,7 @@ import { stringify } from "csv-stringify";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/Q5.js";
-import testSample from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgs/backup.js";
+import testSample from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgs2/backup.js";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/test.js";
 // https://codebeautify.org/javascript-escape-unescape
 
@@ -18,11 +18,12 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const proposalPrefix = "Given the following proposal:"
-const transcriptPrefix = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
+// const transcriptPrefix = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
 
 const proposalQ5N =
 " \"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\""
-const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
+const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
+// const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
 
 export default async function getCompletion(proposal, transcript, questions) {
   const promptE = `${proposalPrefix}${proposal}${questions}${transcript}`;
@@ -44,7 +45,7 @@ export default async function getCompletion(proposal, transcript, questions) {
 async function composeObj(transcription) {
   const response = await getCompletion(
     proposalQ5N,
-    transcription.rawCompletion,
+    transcription.response.completion,
     questions
   );
   const res = {
@@ -80,7 +81,7 @@ async function processTranscript(
 
 await processTranscript(
   testSample,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take7/backup.js"
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take8/backup.js"
 );
 
 // step one convert to json to feed to api piecewise
