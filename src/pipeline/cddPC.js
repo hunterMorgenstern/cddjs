@@ -23,7 +23,8 @@ const quiz = "###\nDirections: Read the Proposal and  Speaker\'s statement caref
 // const proposalPrefix = "###\nproposal: ";
 // const proposalPrefix = "###\nDirections: Read the Proposal and  Speaker\'s statement carefully. Then answer the questions.\n###\nProposal: ";
 // const proposalPrefix = "###\nGiven the following proposal: "
-const proposalPrefix = "\n###\nGiven the following proposal: "
+// const proposalPrefix = "\n###\nGiven the following proposal: "
+const proposalPrefix = "Given the following proposal:"
 // const transcriptPrefix = "\n###\nargument: ";
 // const transcriptPrefix = "\n###\nSpeaker: ";
 // const transcriptPrefix = "speaker: ";
@@ -53,7 +54,7 @@ const  list  =  "###\nGiven the following proposal: \"In order to reduce methane
 //   "\n###\nQuestion 1. Is the Speaker? A) not enough information. B) con proposal. C) pro proposal. \nQuestion 2. Explain your reasoning step by step.\n###\n1."
 // const questions =
 //   "\n###\nQuestion 1. is the speaker? A. pro proposal. B. con proposal.  C. neutral\n###\n1."
-const questions = "\n###\nQuestion 2. List if each argument is a A) for B) against C) not applicable to the given proposal."
+const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
 
 // const prompt = proposal + transcript + questions;
 export default async function getCompletion(proposal, transcript, questions) {
@@ -65,19 +66,22 @@ export default async function getCompletion(proposal, transcript, questions) {
   // console.log("!!!prompt", prompt);
   const promptC = `${transcript}${proposalPrefix}${proposal}${questions}`;
   const prompt =  "1. The speaker does not support the second proposal for an educational campaign to cut out meat because they believe it will be interpreted by the public as a ban on meat consumption.\n2. The speaker is a farmer and they are already regulated by the state of New York in terms of their methane emissions.\n3. The speaker does not believe that the government needs to help farmers with methane emissions.\n###\nGiven the following proposal: \"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\"\n###\nQuestion 2. List if each argument is a A) for B) against C) not applicable to the given proposal."
-  console.log('!!!promptC',promptC);
-  // console.log('!!!prompt',prompt);
+  
+  const promptD  = "Given the following proposal: \"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\"\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n\n1. The speaker does not support the second proposal for an educational campaign to cut out meat because they believe it will be interpreted by the public as a ban on meat consumption.\n2. The speaker is a farmer and they are already regulated by the state of New York in terms of their methane emissions.\n3. The speaker does not believe that the government needs to help farmers with methane emissions."
+  const promptE = `${proposalPrefix}${proposal}${questions}${transcript}`;
+  console.log('!!!promptD',promptD);
+  console.log('!!!promptE',promptE);
   const response = await openai.createCompletion({
     model: "text-davinci-002",
-    prompt: promptC,
+    prompt: promptE,
     temperature: 0.08,
-    max_tokens: 556,
+    max_tokens: 256,
     top_p: 0.06,
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
     //   stop: ["\n"],
   });
-  // console.log('!!!response',response.config.data);
+  console.log('!!!response',response.config.data);
   console.log('!!!response.data.choices[0].text',response.data.choices[0].text);
   // let cunt =  "###\nGiven the following proposal: \"The US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\"\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n\n1. Red meat is bad for our health and we should eat less of it.\n2. Telling people to cut out red meat is not going to do much to regulate it at the farm level.\n3. Cutting out red meat could potentially have a negative impact on the economy."
   // let  fuck = "prompt":"###\\nGiven the following proposal:  \\"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\\"\\n###\\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\\n\\n1. The speaker does not support the second proposal for an educational campaign to cut out meat.\\n2. The speaker believes that the American public will interpret the campaign as a ban on meat consumption.\\n3. The speaker argues that farmers are already regulated on methane emissions.\\n4. The speaker believes that the government does not need to help farmers on these issues."
@@ -167,7 +171,6 @@ async function composeObj(transcription) {
     transcription.rawCompletion,
     questions
   );
-  console.log('!!!completionText',completionText);
   // const columns = formatCompletion(completionText);
   const res = {
     proposal: `${proposalQ5N}`,
@@ -294,8 +297,8 @@ function formattedJsonToCsv(authorTranscripts) {
 }
 await processTranscript(
   testSample,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take3/backup.js",
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take3"
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take5/backup.js",
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take5"
 );
 
 // step one convert to json to feed to api piecewise
