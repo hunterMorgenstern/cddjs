@@ -24,10 +24,10 @@ const proposalQ5O =
   "The U.S. government should limit allowable greenhouse gas emissions including methane from large farms, just as it sets limits for industrial sources.";
 const proposalQ5NM =
   "The US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.";
-// const proposalQ5N =
-//   "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.";
 const proposalQ5N =
-  "The US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.";
+  "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.";
+// const proposalQ5N =
+//   "The US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.";
 // const transcript =
 //   "they heard someone singing about bearing the product where i'm at. now. there's a park here. they used to be a chemical place. they buried products in the ground and also living in buffalo. almost. so close to love canal. and what someone to mention about that bearing, the problem that i'm not really experienced, but i know that there's no guarantee that it's going to work. so i just that does happen to pop in my head. what simon said about bearing the product and i wish i knew that more about the nuclear, like someone says, i'm going to do researching on that. thank you.";
 // const questions =
