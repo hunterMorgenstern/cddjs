@@ -28,7 +28,7 @@ const proposalPrefix = "Given the following proposal:"
 // const transcriptPrefix = "\n###\nargument: ";
 // const transcriptPrefix = "\n###\nSpeaker: ";
 // const transcriptPrefix = "speaker: ";
-const transcriptPrefix = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
+const transcriptPrefix = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
 const proposalQ5O =
   "The U.S. government should limit allowable greenhouse gas emissions including methane from large farms, just as it sets limits for industrial sources.";
 const proposalQ5NM =
@@ -297,8 +297,8 @@ function formattedJsonToCsv(authorTranscripts) {
 }
 await processTranscript(
   testSample,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take5/backup.js",
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take5"
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take6/backup.js",
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take6"
 );
 
 // step one convert to json to feed to api piecewise
