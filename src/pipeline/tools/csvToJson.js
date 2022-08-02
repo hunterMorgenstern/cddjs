@@ -14,6 +14,6 @@ import writeToFile from "/Users/hunter/dev/fr/CDD/src/pipeline/tools/write.js";
         // })
         
         // Async / await usage
-const csvFilePath='/Users/hunter/dev/fr/CDD/data/CDD/climate/Untitled spreadsheet - Sheet2 (1).csv'
+const csvFilePath='/Users/hunter/dev/fr/CDD/data/CDD/climate/Untitled spreadsheet - Sheet3.csv'
 const jsonArray=await csv().fromFile(csvFilePath);
-writeToFile(jsonArray, "/Users/hunter/dev/fr/CDD/data/CDD/climate/sample.js");
+writeToFile(jsonArray, "/Users/hunter/dev/fr/CDD/data/CDD/climate/Q5.js");
