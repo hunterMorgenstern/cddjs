@@ -22,8 +22,8 @@ const proposalPrefix = "Given the following proposal:"
 
 const proposalQ5N =
 " \"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\""
-const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
-// const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
+// const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
+const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
 
 export default async function getCompletion(proposal, transcript, questions) {
   const promptE = `${proposalPrefix}${proposal}${questions}${transcript}`;
@@ -81,7 +81,7 @@ async function processTranscript(
 
 await processTranscript(
   testSample,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take8/backup.js"
+  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take9/backup.js"
 );
 
 // step one convert to json to feed to api piecewise
