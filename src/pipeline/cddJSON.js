@@ -1,14 +1,16 @@
 import dotenv from "dotenv";
 dotenv.config();
+import * as fs from 'fs';
 import { Configuration, OpenAIApi } from "openai";
 // import testSample from "./withTokenCount.js";
-import writeToFile from "/Users/hunter/dev/fr/CDD/src/pipeline/tools/write.js";
+import writeToFile from "./tools/write.js";
 import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
 // import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/Q5.js";
-import testSample from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgs2/backup.js";
+// import testSample from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgs2/backup.js";
+import testSample from "../../results/CDD/climate/listArgs2/backup.js"
 // import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/test.js";
 // https://codebeautify.org/javascript-escape-unescape
 
@@ -56,7 +58,10 @@ async function composeObj(transcription) {
 }
 
 async function transcriptionWithColumns(transcription, backupFile) {
-  const writer = createWriteStream(backupFile);
+  if (!fs.existsSync(backupFile)){
+    fs.mkdirSync(backupFile, { recursive: true });
+}
+  const writer = createWriteStream(`${backupFile}/backup.js`);
   writer.write("export default [");
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composeObj(transcription[i]);
@@ -81,7 +86,7 @@ async function processTranscript(
 
 await processTranscript(
   testSample,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take9/backup.js"
+  "../../results/CDD/climate/listArgsThenPros256take10"
 );
 
 // step one convert to json to feed to api piecewise

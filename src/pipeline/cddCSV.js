@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { createWriteStream } from "fs";
 import { stringify } from "csv-stringify";
-import jsonCompletion from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take9/backup.js";
+import jsonCompletion from "../../results/CDD/climate/listArgsThenPros256take10/backup.js";
 
 function formatAndWriteToCsv(jsonCompletions, csvResultsRepo) {
   // console.log('!!!jsonCompletions',jsonCompletions);
@@ -46,7 +46,7 @@ function formattedJsonToCsv(fullResult) {
 }
 formatAndWriteToCsv(
   jsonCompletion,
-  "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgsThenPros256take9"
+  "../../CDD/results/CDD/climate/listArgsThenPros256take9"
 );
 
 // step one convert to json to feed to api piecewise
