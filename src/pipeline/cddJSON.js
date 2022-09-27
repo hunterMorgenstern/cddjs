@@ -1,17 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
-import * as fs from 'fs';
+import * as fs from "fs";
 import { Configuration, OpenAIApi } from "openai";
-// import testSample from "./withTokenCount.js";
-import writeToFile from "./tools/write.js";
 import { createWriteStream } from "fs";
-import { stringify } from "csv-stringify";
-// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/sacklerdepoFormatted.js";
-// import testSample from "/Users/hunter/dev/fr/CDD/data/Docs4FileRead/testSample.js";
-// import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/Q5.js";
-// import testSample from "/Users/hunter/dev/fr/CDD/results/CDD/climate/listArgs2/backup.js";
-import testSample from "../../results/CDD/climate/listArgs2/backup.js"
-// import testSample from "/Users/hunter/dev/fr/CDD/data/CDD/climate/test.js";
+import testSample from "../../results/CDD/climate/listArgs2/backup.js";
 // https://codebeautify.org/javascript-escape-unescape
 
 const configuration = new Configuration({
@@ -19,54 +11,46 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-const proposalPrefix = "Given the following proposal:"
-// const transcriptPrefix = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
-
-const proposalQ5N =
-" \"In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption.\""
-// const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) neutral D) not applicable\n"
-const questions = "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n"
-
-export default async function getCompletion(proposal, transcript, questions) {
-  const promptE = `${proposalPrefix}${proposal}${questions}${transcript}`;
+async function getCompletion(prompt) {
   const response = await openai.createCompletion({
     model: "text-davinci-002",
-    prompt: promptE,
+    prompt: prompt,
     temperature: 0.08,
     max_tokens: 256,
     top_p: 0.06,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.0,
+    frequency_penalty: 0.0,
+    presence_penalty: 0.0,
     //   stop: ["\n"],
   });
-  console.log('!!!response',response.config.data);
-  console.log('!!!response.data.choices[0].text',response.data.choices[0].text);
-  return { config: response.config.data, completion: response.data.choices[0].text};
+  return {
+    config: response.config.data,
+    completion: response.data.choices[0].text,
+  };
 }
 
+const proposalPrefix = "Given the following proposal:";
+const proposalQ5N =
+  ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."';
+const questions =
+  "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n";
 async function composeObj(transcription) {
-  const response = await getCompletion(
-    proposalQ5N,
-    transcription.response.completion,
-    questions
-  );
+  const promptE = `${proposalPrefix}${proposalQ5N}${questions}${transcription.response.completion}`;
+  const response = await getCompletion(promptE);
   const res = {
     transcription,
-    response
+    response,
   };
   return res;
 }
 
 async function transcriptionWithColumns(transcription, backupFile) {
-  if (!fs.existsSync(backupFile)){
+  if (!fs.existsSync(backupFile)) {
     fs.mkdirSync(backupFile, { recursive: true });
-}
+  }
   const writer = createWriteStream(`${backupFile}/backup.js`);
   writer.write("export default [");
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composeObj(transcription[i]);
-    // pipe each obj to a file
-    console.log('!!!obj',obj);
     writer.write(JSON.stringify(obj) + ",");
   }
   writer.write("]");
@@ -74,20 +58,15 @@ async function transcriptionWithColumns(transcription, backupFile) {
   return;
 }
 
-async function processTranscript(
-  transcriptJSONFile,
-  fullBackupFile,
-) {
-   await transcriptionWithColumns(
-    transcriptJSONFile,
-    fullBackupFile
-  );
+async function processTranscript(transcriptJSONFile, fullBackupFile) {
+  await transcriptionWithColumns(transcriptJSONFile, fullBackupFile);
 }
 
-await processTranscript(
-  testSample,
-  "../../results/CDD/climate/listArgsThenPros256take10"
-);
+// await processTranscript(
+//   testSample,
+//   "../../results/CDD/climate/listArgsThenPros256take10"
+// );
 
+export default processTranscript;
 // step one convert to json to feed to api piecewise
 //
