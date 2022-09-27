@@ -22,6 +22,7 @@ async function getCompletion(prompt) {
     presence_penalty: 0.0,
     //   stop: ["\n"],
   });
+  console.log('!!!response',response);
   return {
     config: response.config.data,
     completion: response.data.choices[0].text,
@@ -50,6 +51,7 @@ async function transcriptionWithColumns(transcription, backupFile) {
   writer.write("export default [");
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composeObj(transcription[i]);
+    console.log('!!!objList',obj);
     writer.write(JSON.stringify(obj) + ",");
   }
   writer.write("]");
