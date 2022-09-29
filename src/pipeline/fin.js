@@ -8,24 +8,39 @@ import * as fs from "fs";
 // const csvFilePath='../../data/CDD/climate/Untitled spreadsheet - Sheet3.csv'
 // import testSample from "../../results/CDD/climate/listArgs2/backup.js";
 // console.log('!!!jsonArray',jsonArray);
-async function proposalSummarization(transcriptCSV, resultsRepo) {
+async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   const jsonArray = await csv().fromFile(transcriptCSV);
   // writeToFile(jsonArray, "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Q5.js");
   await processListTranscript(jsonArray, `${resultsRepo}/list/`);
   const argumentsListed = await import(`${resultsRepo}/list/backup.js`);
   console.log("111", argumentsListed.default);
-  await processProsTranscript(argumentsListed.default, `${resultsRepo}/args/`);
+  proposals.forEach(async (proposal) => {
+  await processProsTranscript(argumentsListed.default, `${resultsRepo}/args/`, proposal.text);
   const jsonCompletion = await import(`${resultsRepo}/args/backup.js`);
-  const proposal = "q5n";
   await formatAndWriteToCsv(
-    proposal,
+    proposal.number,
     jsonCompletion.default,
     `${resultsRepo}/proposals/`
   );
+  });
 }
 
 const csvFilePath =
   "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet4.csv";
 const resultsDestination =
   "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take13";
-proposalSummarization(csvFilePath, resultsDestination);
+const proposals = [
+  {
+    number: "q5n",
+    text:
+      ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
+  },
+  {
+    number: "q9",
+    text:
+      ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
+  },
+];
+proposalSummarization(csvFilePath, resultsDestination, proposals);
+// TODO parse/make sure pros/cons are formatted correctly
+// TODO merge all proposal results into one csv

@@ -3,37 +3,18 @@ dotenv.config();
 import { createWriteStream } from "fs";
 import * as fs from "fs";
 import { stringify } from "csv-stringify";
-// import jsonCompletion from "../../results/CDD/climate/listArgsThenPros256take10/backup.js";
 
 export default async function formatAndWriteToCsv(proposal, jsonCompletions, csvResultsRepo) {
-  // console.log('!!!jsonCompletions',jsonCompletions);
   if (!fs.existsSync(csvResultsRepo)) {
     await fs.promises.mkdir(csvResultsRepo, { recursive: true });
   }
   const destinationFileName = `${csvResultsRepo}${proposal}.csv`;
-  const writableStream = createWriteStream(destinationFileName);
   const columns = ["order", "author", "summary", "pros", "text"];
+  const writableStream = createWriteStream(destinationFileName);
   const stringifier = stringify({ header: true, columns: columns });
   jsonCompletions.forEach((fullResult) => {
-    // console.log("!!!fullResult", fullResult);
-
-    // const author = 'chrontranscript';
     const formattedForCsv = formattedJsonToCsv(fullResult);
-
-    console.log("!!!formattedForCsv", formattedForCsv);
     stringifier.write(formattedForCsv);
-    // pipeToCsv(formattedForCsv, filename, columns);
-  });
-  stringifier.pipe(writableStream);
-}
-
-// given columns and arrayOfRows in  the same order and pipe to csv
-function pipeToCsv(arrayOfRows, destinationFileName, columns) {
-  const writableStream = createWriteStream(destinationFileName);
-  const stringifier = stringify({ header: true, columns: columns });
-
-  arrayOfRows.forEach((summaries) => {
-    stringifier.write(summaries);
   });
   stringifier.pipe(writableStream);
 }
@@ -47,10 +28,3 @@ function formattedJsonToCsv(fullResult) {
   const pros = fullResult.response.completion;
   return [order, author, summary, pros, text];
 }
-// formatAndWriteToCsv(
-//   jsonCompletion,
-//   "../../CDD/results/CDD/climate/listArgsThenPros256take9"
-// );
-
-// step one convert to json to feed to api piecewise
-//
