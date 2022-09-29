@@ -12,11 +12,12 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   proposals.forEach(async (proposal) => {
     await processProsTranscript(
       argumentsListed.default,
-      `${resultsRepo}/args/`,
-      proposal.text
+      `${resultsRepo}/pros/`,
+      proposal.text,
+      proposal.number
     );
     
-    const jsonCompletion = await import(`${resultsRepo}/pros/backup.js`);
+    const jsonCompletion = await import(`${resultsRepo}/pros/${proposal.number}/backup.js`);
     await formatAndWriteToCsv(
       proposal.number,
       jsonCompletion.default,
@@ -26,9 +27,9 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
 }
 
 const csvFilePath =
-  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet3.csv";
+  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet4.csv";
 const resultsDestination =
-  "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/results";
+  "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/results1";
 const proposals = [
   {
     number: "q5n",

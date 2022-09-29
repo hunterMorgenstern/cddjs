@@ -3,7 +3,7 @@ import { createWriteStream } from "fs";
 import getCompletion from "./tools/openai.js";
 // https://codebeautify.org/javascript-escape-unescape
 
-async function composePromptAndGetCompletion(transcription, proposalText) {
+async function composePromptAndGetCompletion(transcription, proposalText, proposalNumber) {
   const proposalPrefix = "Given the following proposal:";
   const questions =
     "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n";
@@ -12,6 +12,8 @@ async function composePromptAndGetCompletion(transcription, proposalText) {
   const res = {
     transcription,
     response,
+    proposalText,
+    proposalNumber,
   };
   return res;
 }
@@ -19,17 +21,21 @@ async function composePromptAndGetCompletion(transcription, proposalText) {
 async function transcriptionWithColumns(
   transcription,
   backupFile,
-  proposalText = ""
+  proposalText = "",
+  proposalNumber = 0
 ) {
-  if (!fs.existsSync(backupFile)) {
-    await fs.promises.mkdir(backupFile, { recursive: true });
+  if (!fs.existsSync(`${backupFile}${proposalNumber}`)) {
+    await fs.promises.mkdir(`${backupFile}${proposalNumber}`, {
+      recursive: true,
+    });
   }
-  const writer = createWriteStream(`${backupFile}/backup.js`);
+  const writer = createWriteStream(`${backupFile}${proposalNumber}/backup.js`);
   writer.write("export default [");
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composePromptAndGetCompletion(
       transcription[i],
-      proposalText
+      proposalText,
+      proposalNumber
     );
     writer.write(JSON.stringify(obj) + ",");
   }
