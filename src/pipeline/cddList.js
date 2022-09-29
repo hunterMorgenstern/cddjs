@@ -24,16 +24,16 @@ async function transcriptionWithColumns(
   if (!fs.existsSync(backupFile)) {
     await fs.promises.mkdir(backupFile, { recursive: true });
   }
-  const writer = createWriteStream(`${backupFile}/backup.js`);
-  writer.write("export default [");
+  const writer = createWriteStream(`${backupFile}/backup.json`);
+  const listObj = []
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composePromptAndGetCompletion(
       transcription[i],
       proposalText
     );
-    writer.write(JSON.stringify(obj) + ",");
+    listObj.push(obj)
   }
-  writer.write("]");
+  writer.write(JSON.stringify(listObj));
   writer.end();
   return;
 }
