@@ -5,9 +5,8 @@ import * as fs from "fs";
 import { stringify } from "csv-stringify";
 // import jsonCompletion from "../../results/CDD/climate/listArgsThenPros256take10/backup.js";
 
-export default async function formatAndWriteToCsv(jsonCompletions, csvResultsRepo) {
+export default async function formatAndWriteToCsv(proposal, jsonCompletions, csvResultsRepo) {
   // console.log('!!!jsonCompletions',jsonCompletions);
-  const proposal = "q5n";
   if (!fs.existsSync(csvResultsRepo)) {
     await fs.promises.mkdir(csvResultsRepo, { recursive: true });
   }

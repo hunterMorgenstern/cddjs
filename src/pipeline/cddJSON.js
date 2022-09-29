@@ -59,15 +59,15 @@ async function transcriptionWithColumns(transcription, backupFile) {
   return;
 }
 
-async function processTranscript(transcriptJSONFile, fullBackupFile) {
-  await transcriptionWithColumns(transcriptJSONFile, fullBackupFile);
-}
+// async function processTranscript(transcriptJSONFile, fullBackupFile) {
+//   await transcriptionWithColumns(transcriptJSONFile, fullBackupFile);
+// }
 
 // await processTranscript(
 //   testSample,
 //   "../../results/CDD/climate/listArgsThenPros256take10"
 // );
 
-export default processTranscript;
+export default transcriptionWithColumns;
 // step one convert to json to feed to api piecewise
 //

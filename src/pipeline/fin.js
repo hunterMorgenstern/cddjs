@@ -8,31 +8,24 @@ import * as fs from "fs";
 // const csvFilePath='../../data/CDD/climate/Untitled spreadsheet - Sheet3.csv'
 // import testSample from "../../results/CDD/climate/listArgs2/backup.js";
 // console.log('!!!jsonArray',jsonArray);
-async function proposalSummarization() {
-  const csvFilePath =
-    "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet4.csv";
-  const jsonArray = await csv().fromFile(csvFilePath);
+async function proposalSummarization(transcriptCSV, resultsRepo) {
+  const jsonArray = await csv().fromFile(transcriptCSV);
   // writeToFile(jsonArray, "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Q5.js");
-
-  await processListTranscript(
-    jsonArray,
-    "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take12/list/"
-  );
-  const argumentsListed = await import(
-    "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take12/list/backup.js"
-  );
+  await processListTranscript(jsonArray, `${resultsRepo}/list/`);
+  const argumentsListed = await import(`${resultsRepo}/list/backup.js`);
   console.log("111", argumentsListed.default);
-  await processProsTranscript(
-    argumentsListed.default,
-    "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take12/args/"
-  );
-  const jsonCompletion = await import(
-    "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take12/args/backup.js"
-  );
+  await processProsTranscript(argumentsListed.default, `${resultsRepo}/args/`);
+  const jsonCompletion = await import(`${resultsRepo}/args/backup.js`);
+  const proposal = "q5n";
   await formatAndWriteToCsv(
+    proposal,
     jsonCompletion.default,
-    "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take12/proposals/"
+    `${resultsRepo}/proposals/`
   );
 }
 
-proposalSummarization();
+const csvFilePath =
+  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet4.csv";
+const resultsDestination =
+  "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/listArgsThenPros256take13";
+proposalSummarization(csvFilePath, resultsDestination);
