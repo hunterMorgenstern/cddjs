@@ -45,7 +45,7 @@ async function composeObj(transcription) {
 
 async function transcriptionWithColumns(transcription, backupFile) {
   if (!fs.existsSync(backupFile)) {
-    fs.mkdirSync(backupFile, { recursive: true });
+    await fs.promises.mkdir(backupFile, { recursive: true });
   }
   const writer = createWriteStream(`${backupFile}/backup.js`);
   writer.write("export default [");

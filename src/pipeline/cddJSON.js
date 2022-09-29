@@ -45,13 +45,13 @@ async function composeObj(transcription) {
 
 async function transcriptionWithColumns(transcription, backupFile) {
   if (!fs.existsSync(backupFile)) {
-    fs.mkdirSync(backupFile, { recursive: true });
+    await fs.promises.mkdir(backupFile, { recursive: true });
   }
   const writer = createWriteStream(`${backupFile}/backup.js`);
   writer.write("export default [");
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composeObj(transcription[i]);
-    console.log('!!!obj',obj);
+    console.log("!!!obj", obj);
     writer.write(JSON.stringify(obj) + ",");
   }
   writer.write("]");
