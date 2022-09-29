@@ -1,13 +1,17 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { createWriteStream } from "fs";
+import * as fs from "fs";
 import { stringify } from "csv-stringify";
-import jsonCompletion from "../../results/CDD/climate/listArgsThenPros256take10/backup.js";
+// import jsonCompletion from "../../results/CDD/climate/listArgsThenPros256take10/backup.js";
 
-function formatAndWriteToCsv(jsonCompletions, csvResultsRepo) {
+export default async function formatAndWriteToCsv(jsonCompletions, csvResultsRepo) {
   // console.log('!!!jsonCompletions',jsonCompletions);
   const proposal = "q5n";
-  const destinationFileName = `${csvResultsRepo}/${proposal}.csv`;
+  if (!fs.existsSync(csvResultsRepo)) {
+    await fs.promises.mkdir(csvResultsRepo, { recursive: true });
+  }
+  const destinationFileName = `${csvResultsRepo}${proposal}.csv`;
   const writableStream = createWriteStream(destinationFileName);
   const columns = ["order", "author", "summary", "pros", "text"];
   const stringifier = stringify({ header: true, columns: columns });
@@ -44,10 +48,10 @@ function formattedJsonToCsv(fullResult) {
   const pros = fullResult.response.completion;
   return [order, author, summary, pros, text];
 }
-formatAndWriteToCsv(
-  jsonCompletion,
-  "../../CDD/results/CDD/climate/listArgsThenPros256take9"
-);
+// formatAndWriteToCsv(
+//   jsonCompletion,
+//   "../../CDD/results/CDD/climate/listArgsThenPros256take9"
+// );
 
 // step one convert to json to feed to api piecewise
 //
