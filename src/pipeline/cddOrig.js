@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { createWriteStream } from "fs";
 import getCompletion from "./tools/openai.js";
+import formatCompletion from "./cddCSVFromOrig.js";
 // https://codebeautify.org/javascript-escape-unescape
 
 async function composePromptAndGetCompletion(transcription, proposalText) {
@@ -30,6 +31,8 @@ async function transcriptionWithColumns(
       transcription[i],
       proposalText
     );
+    const formattedForCsv = formatCompletion(obj.response.completion);
+    obj.formatted = formattedForCsv;  
     writer.write(JSON.stringify(obj) + ",");
   }
   writer.write("]");

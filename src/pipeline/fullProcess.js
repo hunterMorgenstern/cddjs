@@ -1,34 +1,14 @@
-import * as fs from "fs";
-import { createWriteStream } from "fs";
 import csv from "csvtojson";
 import processListTranscript from "./cddList.js";
 import processProsTranscript from "./cddPros.js";
 import formatAndWriteToCsv from "./cddCSV.js";
 import factsAndAnecdotes from "./cddOrig.js";
-import formatCompletion from "./cddCSVFromOrig.js";
 
 async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   const jsonArray = await csv().fromFile(transcriptCSV);
 
   // original transcript summary
   await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
-  const factAndAnecdotesCompletions = await import(`${resultsRepo}/facts/backup.js`);
-  if (!fs.existsSync(`${resultsRepo}/factsFormatted/`)) {
-    await fs.promises.mkdir(`${resultsRepo}/factsFormatted/`, {
-      recursive: true,
-    });
-  }
-  const writer = createWriteStream(`${resultsRepo}/factsFormatted/backup.js`);
-  writer.write("export default [");
-  factAndAnecdotesCompletions.default.forEach((fullResult) => {
-    console.log('!!!fullResult',fullResult);
-    const formattedForCsv = formatCompletion(fullResult.response.completion);
-    console.log('!!!formattedForCsv',formattedForCsv);
-    fullResult.formatted = formattedForCsv;
-    writer.write(JSON.stringify(fullResult) + ",");
-  });
-  writer.write("]");
-  writer.end();
 
   // list of arguments
   await processListTranscript(jsonArray, `${resultsRepo}/list/`);
