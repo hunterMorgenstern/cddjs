@@ -6,7 +6,9 @@ import getCompletion from "./tools/openai.js";
 async function composePromptAndGetCompletion(transcription, proposalText, proposalNumber) {
   const proposalPrefix = "Given the following proposal:";
   const questions =
-    "\n###\nQuestion 2. List if each argument is a A) pro B) con C) not applicable to the given proposal.\n\n1.";
+    "\n###\nQuestion 2. The following is a two part question: List if each argument is a A) pro B) con C) not applicable to the given proposal.\n Explain your reasoning for each. Give your answer in the following format: [argument number] [A/B/C] Reason: [reason]\n###\n";
+  // const answerPriming = "\n###\nAnswer: \n1.";
+  // const promptE = `${proposalPrefix}${proposalText}${questions}${transcription.response.completion}${answerPriming}`;
   const promptE = `${proposalPrefix}${proposalText}${questions}${transcription.response.completion}`;
   const response = await getCompletion(promptE);
   const res = {

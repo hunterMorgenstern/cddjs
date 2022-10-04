@@ -8,7 +8,7 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   const jsonArray = await csv().fromFile(transcriptCSV);
 
   // original transcript summary
-  await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
+  // await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
 
   // list of arguments
   await processListTranscript(jsonArray, `${resultsRepo}/list/`);
@@ -35,14 +35,14 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
 }
 
 const csvFilePath =
-  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet4.csv";
+  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet3.csv";
 const resultsDestination =
   "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/results1";
 const proposals = [
-  {
-    number: "q5n",
-    text: ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
-  },
+  // {
+  //   number: "q5n",
+  //   text: ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
+  // },
   {
     number: "q9",
     text: ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
