@@ -35,6 +35,6 @@ async function transcriptionWithColumns(
   }
   writer.write(JSON.stringify(listObj));
   writer.end();
-  return;
+  return listObj;
 }
 export default transcriptionWithColumns;

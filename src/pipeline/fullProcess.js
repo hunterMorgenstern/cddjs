@@ -44,15 +44,15 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   // await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
 
   // list of arguments
-  await processListTranscript(jsonArray, `${resultsRepo}/list/`);
+  const argumentsListed = await processListTranscript(jsonArray, `${resultsRepo}/list/`);
 
-  const rawBackup = fs.readFileSync(`${resultsRepo}/list/backup.json`);
-  const argumentsListed = JSON.parse(rawBackup);
+  // const rawBackup = fs.readFileSync(`${resultsRepo}/list/backup.json`);
+  // const argumentsListed = JSON.parse(rawBackup);
 
   // pros and cons
   proposals.forEach(async (proposal) => {
     const argumentsListedCleaned = await cleanupArguments(argumentsListed, proposal.text)
-    await processProsTranscript(
+    const jsonCompletion = await processProsTranscript(
       argumentsListedCleaned,
       `${resultsRepo}/pros/`,
       proposal.text,
@@ -60,8 +60,6 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
     );
     
     // format and write to csv
-    const rawCompletion = fs.readFileSync(`${resultsRepo}/pros/${proposal.number}/backup.json`);
-    const jsonCompletion = JSON.parse(rawCompletion);
     await formatAndWriteToCsv(
       proposal.number,
       jsonCompletion,
