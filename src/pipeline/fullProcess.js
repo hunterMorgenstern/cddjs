@@ -2,7 +2,7 @@ import csv from "csvtojson";
 import processListTranscript from "./cddList.js";
 import processProsTranscript from "./cddPros.js";
 import formatAndWriteToCsv from "./cddCSV.js";
-import factsAndAnecdotes from "./cddOrig.js";
+import processFactsAndAnecdotes from "./cddOrig.js";
 import fs from 'fs'
 
 const dudLines = [
@@ -11,6 +11,14 @@ const dudLines = [
   'is the best thing ever',
   'is the worst thing ever'
 ]
+
+// TODO 
+// Simplify the openai task to grab anecdotes & facts
+// List the facts/anecdotes
+
+// TODO (if I have time)
+// Compare the arguments to the proposal to see if they are for/against
+
 
 async function cleanupArguments(argsListed, proposal) {
   const newJson = JSON.parse(JSON.stringify(argsListed))
@@ -41,7 +49,12 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   const jsonArray = await csv().fromFile(transcriptCSV);
 
   // original transcript summary
-  // await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
+  // console.log("transcriptData: " + jsonArray);
+  // console.log(`${resultsRepo}`);
+  // console.log(`${resultsRepo}/facts/`);
+  const factsAndAnecdotes = await processFactsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
+
+
 
   // list of arguments
   const argumentsListed = await processListTranscript(jsonArray, `${resultsRepo}/list/`);
@@ -51,7 +64,9 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
 
   // pros and cons
   proposals.forEach(async (proposal) => {
+    console.log("Proposal: "+proposal.text)
     const argumentsListedCleaned = await cleanupArguments(argumentsListed, proposal.text)
+    // const factsAndAnecdotesCleaned = await cleanupArguments(factsAndAnecdotes, proposal.text)
     const jsonCompletion = await processProsTranscript(
       argumentsListedCleaned,
       `${resultsRepo}/pros/`,

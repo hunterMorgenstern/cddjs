@@ -7,7 +7,8 @@ async function composePromptAndGetCompletion(transcription, proposalText) {
   const transcriptPrefix = 'speaker: "';
   const questions = "\"\n###\nQuestion 1. List this speaker's arguments:\n";
 
-  const promptE = `${transcriptPrefix}${transcription.text}${questions}`;
+  const promptE = `${transcriptPrefix}${transcription.Text}${questions}`;
+  console.log(promptE)
   const response = await getCompletion(promptE);
   const res = {
     transcription,
@@ -33,6 +34,7 @@ async function transcriptionWithColumns(
     );
     listObj.push(obj)
   }
+  console.log("list: " + JSON.stringify(listObj))
   writer.write(JSON.stringify(listObj));
   writer.end();
   return listObj;
