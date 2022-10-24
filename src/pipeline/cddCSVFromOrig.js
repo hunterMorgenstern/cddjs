@@ -7,6 +7,7 @@ import { stringify } from "csv-stringify";
 const formatCompletion = (responseText) => {
   const lines = responseText.split("\n");
   const cleanedLines = lines.filter((line) => line.length > 0);
+  console.log(cleanedLines);
   const columns = {
     topic: null, // 10
     "summary of points": null, // 3

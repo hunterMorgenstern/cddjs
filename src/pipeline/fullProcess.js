@@ -52,34 +52,37 @@ async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   // console.log("transcriptData: " + jsonArray);
   // console.log(`${resultsRepo}`);
   // console.log(`${resultsRepo}/facts/`);
-  const factsAndAnecdotes = await processFactsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
+  
 
 
 
-  // list of arguments
+  // list of arguments -> this creates the arglist.json
   const argumentsListed = await processListTranscript(jsonArray, `${resultsRepo}/list/`);
 
   // const rawBackup = fs.readFileSync(`${resultsRepo}/list/backup.json`);
-  // const argumentsListed = JSON.parse(rawBackup);
+  // // const argumentsListed = JSON.parse(rawBackup);
 
   // pros and cons
   proposals.forEach(async (proposal) => {
     console.log("Proposal: "+proposal.text)
-    const argumentsListedCleaned = await cleanupArguments(argumentsListed, proposal.text)
+    const argumentsListedCleaned = await cleanupArguments(argumentsListed, proposal.text);
+    const factsAndAnecdotes = await processFactsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`, proposal.text);
+    // console.log("Args cleaned: \n " + argumentsListedCleaned);
     // const factsAndAnecdotesCleaned = await cleanupArguments(factsAndAnecdotes, proposal.text)
-    const jsonCompletion = await processProsTranscript(
-      argumentsListedCleaned,
-      `${resultsRepo}/pros/`,
-      proposal.text,
-      proposal.number
-    );
+    
+    // const jsonCompletion = await processProsTranscript(
+    //   argumentsListedCleaned,
+    //   `${resultsRepo}/pros/`,
+    //   proposal.text,
+    //   proposal.number
+    // );
     
     // format and write to csv
-    await formatAndWriteToCsv(
-      proposal.number,
-      jsonCompletion,
-      `${resultsRepo}/proposals/`
-    );
+    // await formatAndWriteToCsv(
+    //   proposal.number,
+    //   jsonCompletion,
+    //   `${resultsRepo}/proposals/`
+    // );
   });
 }
 
