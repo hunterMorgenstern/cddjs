@@ -2,54 +2,90 @@ import csv from "csvtojson";
 import processListTranscript from "./cddList.js";
 import processProsTranscript from "./cddPros.js";
 import formatAndWriteToCsv from "./cddCSV.js";
-import factsAndAnecdotes from "./cddOrig.js";
+import processFactsAndAnecdotes from "./cddOrig.js";
+import fs from 'fs'
+
+const dudLines = [
+  'is okay',
+  'is bad',
+  'is the best thing ever',
+  'is the worst thing ever'
+]
+
+// TODO 
+// Simplify the openai task to grab anecdotes & facts
+// List the facts/anecdotes
+
+// TODO (if I have time)
+// Compare the arguments to the proposal to see if they are for/against
+
+
+async function cleanupArguments(argsListed, proposal) {
+  const newJson = JSON.parse(JSON.stringify(argsListed))
+  // force the completion to have at least 5 lines
+  for (var i = 0; i < argsListed.length; i++) {
+    const line = newJson[i]['response']['completion']
+    const lines = line.split('\n')
+    const newLines = []
+    for (var j = 0; j < lines.length; j++) {
+      if (lines[j].length > 0) {
+        newLines.push(lines[j])
+      }
+    }
+    if (newLines.length == 1 && newLines[0].length >= 1 && newLines[0][0] != '1') {
+      newLines[0] = `1. ${newLines[0]}`
+    }
+    let start = 0
+    while (newLines.length < 5) {
+      newLines.push(`${newLines.length + 1}. ${proposal} ${dudLines[start]}`)
+      start += 1;
+    }
+    newJson[i]['response']['completion'] = newLines.join('\n');
+  }
+  return newJson
+}
 
 async function proposalSummarization(transcriptCSV, resultsRepo, proposals) {
   const jsonArray = await csv().fromFile(transcriptCSV);
 
   // original transcript summary
-  // await factsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`);
+  // console.log("transcriptData: " + jsonArray);
+  // console.log(`${resultsRepo}`);
+  // console.log(`${resultsRepo}/facts/`);
+  
 
-  // list of arguments
-  await processListTranscript(jsonArray, `${resultsRepo}/list/`);
 
-  const argumentsListed = await import(`${resultsRepo}/list/backup.js`);
+
+  // list of arguments -> this creates the arglist.json
+  const argumentsListed = await processListTranscript(jsonArray, `${resultsRepo}/list/`);
+
+  // const rawBackup = fs.readFileSync(`${resultsRepo}/list/backup.json`);
+  // // const argumentsListed = JSON.parse(rawBackup);
 
   // pros and cons
   proposals.forEach(async (proposal) => {
-    await processProsTranscript(
-      argumentsListed.default,
-      `${resultsRepo}/pros/`,
-      proposal.text,
-      proposal.number
-    );
+    console.log("Proposal: "+proposal.text)
+    const argumentsListedCleaned = await cleanupArguments(argumentsListed, proposal.text);
+    const factsAndAnecdotes = await processFactsAndAnecdotes(jsonArray, `${resultsRepo}/facts/`, proposal.text);
+    // console.log("Args cleaned: \n " + argumentsListedCleaned);
+    // const factsAndAnecdotesCleaned = await cleanupArguments(factsAndAnecdotes, proposal.text)
+    
+    // const jsonCompletion = await processProsTranscript(
+    //   argumentsListedCleaned,
+    //   `${resultsRepo}/pros/`,
+    //   proposal.text,
+    //   proposal.number
+    // );
     
     // format and write to csv
-    const jsonCompletion = await import(`${resultsRepo}/pros/${proposal.number}/backup.js`);
-    await formatAndWriteToCsv(
-      proposal.number,
-      jsonCompletion.default,
-      `${resultsRepo}/proposals/`
-    );
+    // await formatAndWriteToCsv(
+    //   proposal.number,
+    //   jsonCompletion,
+    //   `${resultsRepo}/proposals/`
+    // );
   });
 }
 
-const csvFilePath =
-  "/Users/hunter/dev/cdd/cddjs/data/CDD/climate/Untitled spreadsheet - Sheet3.csv";
-const resultsDestination =
-  "/Users/hunter/dev/cdd/cddjs/results/CDD/climate/results1";
-const proposals = [
-  // {
-  //   number: "q5n",
-  //   text: ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
-  // },
-  {
-    number: "q9",
-    text: ' "In order to reduce methane emissions produced by livestock, the US should launch an educational campaign to encourage people to reduce their meat and dairy consumption."',
-  },
-];
-proposalSummarization(csvFilePath, resultsDestination, proposals);
-// TODO parse/make sure pros/cons are formatted correctly
-// TODO merge all proposal results into one csv
-
-// can either generate csvs and then combine them or combine them as json and then generate csvs
+let rawdata = fs.readFileSync(process.env.PROPOSAL_JSON_FILE_PATH);
+const proposals = JSON.parse(rawdata);
+proposalSummarization(process.env.CSV_FILE_PATH, process.env.RESULTS_DESTINATION, proposals);

@@ -31,18 +31,18 @@ async function transcriptionWithColumns(
       recursive: true,
     });
   }
-  const writer = createWriteStream(`${backupFile}${proposalNumber}/backup.js`);
-  writer.write("export default [");
+  const writer = createWriteStream(`${backupFile}${proposalNumber}/backup.json`);
+  const listObj = []
   for (let i = 0; i < transcription.length; i++) {
     const obj = await composePromptAndGetCompletion(
       transcription[i],
       proposalText,
       proposalNumber
     );
-    writer.write(JSON.stringify(obj) + ",");
+    listObj.push(obj)
   }
-  writer.write("]");
+  writer.write(JSON.stringify(listObj));
   writer.end();
-  return;
+  return listObj;
 }
 export default transcriptionWithColumns;

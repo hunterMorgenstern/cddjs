@@ -1,2 +1,5 @@
 .env
-node_modules/
+.envrc
+data/**
+node_modules/**
+**/.DS_Store
